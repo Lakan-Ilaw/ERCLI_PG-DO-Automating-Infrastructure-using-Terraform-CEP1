@@ -1,0 +1,41 @@
+---
+- name: Install Java, Python, and Jenkins
+  hosts: all
+  become: true
+  remote_user: ubuntu
+  vars:
+    ansible_shell_executable_timeout: 600
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Python
+      shell: apt install python3 -y
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install default JDK
+      shell: apt-get install default-jdk -y
+    
+    - name: Update apt cache again
+      apt:
+        update_cache: yes
+
+    - name: Add Jenkins repository key
+      shell: "curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null"
+
+    - name: Add Jenkins repository source
+      shell: "echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null"
+
+    - name: Update apt cache again
+      apt:
+        update_cache: yes
+
+    - name: Install Jenkins package
+      shell: apt-get install jenkins -y
+
+    - name: Restart Jenkins service
+      shell: service jenkins restart
